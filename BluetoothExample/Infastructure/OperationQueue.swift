@@ -87,14 +87,10 @@ class BLEOper {
                 let operation = BLESyncOperation(operationModel: self.operationModel)
                 self.notCancellableOperations.append(operation)
             }
-      //  }
-     //       )
         
-     //   self.item.notify(queue: self.serialQueue) {
             for (index,value) in self.cancellableOperations.enumerated() {
                     self.start(operation: value)
                     value.writed = true
-     //}
         }
         
         
