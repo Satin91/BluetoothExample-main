@@ -72,11 +72,6 @@ class BleClientImpl: NSObject, BleClient {
         queue.start {
             peripheral.writeValue(value, for: characteristic, type: .withResponse)
         }
-        
-        
-        //print("Name\(name)")
-        
-    //    self.queue.start(operation: operation)
     }
     
     func getDevicesList(peripheral: CBPeripheral) {

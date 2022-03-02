@@ -41,7 +41,6 @@ struct BLEOperationStruct {
             self.operation.qualityOfService = .userInitiated
         }
     }
-    
 }
 
 
@@ -50,33 +49,45 @@ class BLEOper {
     
     var queue: BLEQueue!
     
-    var cancellableOperations: [BLESyncOperation] = []
+    var cancellableOperations: [BLEOperation] = []
     var notCancellableOperations: [BLESyncOperation] = []
     var operationModel: OperationModel!
     // var operation: BLESyncOperation
     let serialQueue = DispatchQueue(label: "serialQueue")
     var item : DispatchWorkItem!
     
-    func load(queue: BLEQueue, operationModel: OperationModel) {
-        self.queue = queue
-        self.operationModel = operationModel
+    func load(queue: BLEQueue, handler: @escaping () -> Void) {
+        let operation = BLEOperation(handler: handler)
+        operation.state = .ready
+        operation.name = "1"
+        self.cancellableOperations.append(operation)
+       // queue.addOperation(operation)
+        //let operation2 = BLEOperation(handler: handler)
+        //operation2.state = .executing
+        //operation2.name = "2"
+    //    queue.addOperation(operation2)
     }
-    
-    func start() {
-        print(Thread.current)
-        let operation = BLESyncOperation(operationModel: self.operationModel)
-        queue.addOperation(operation)
-    }
-    
-    func removeOperations() {
-        guard let queue = self.queue else { return }
-        for index in 0..<queue.operations.count {
-            let value = queue.operations[index]
-            if value.name == "UI" {
-                print("cancel")
-                value.cancel()
-            }
+    func start(queue: BLEQueue) {
+        
+        for i in self.cancellableOperations {
+            queue.addOperation(i)
         }
+        
+        
+        
+//        for i in queue.operations {
+//            let oper = i as! BLEOperation
+//            if oper.name == "1" {
+//                oper.state = .ready
+//            } else {
+//                //oper.cancel()
+//                //oper.state = .finished
+//            }
+            
+            
+        self.cancellableOperations.removeAll()
+        
+        print(queue.operations.count)
     }
 }
 
@@ -93,17 +104,15 @@ class BLEQueue: OperationQueue {
     func start(block: @escaping ()->Void ) {
         
         
-        let model = OperationModel(type: .UI , block: block)
+        bleOper.load(queue: self, handler: block)
         
-        bleOper.load(queue: self, operationModel: model)
-        
-        bleOper.start()
-        
+        if isSuspended == false {
+            bleOper.start(queue: self)
+        }
         isSuspended = true
     }
     
     func resume() {
-        bleOper.removeOperations()
         self.isSuspended = false
     }
     
@@ -115,22 +124,93 @@ class BLEQueue: OperationQueue {
 }
 
 
-class BLESyncOperation: Operation {
+class BLEOperation: BLESyncOperation {
+   
     
+    var handler: (() -> Void)
+    
+    init(handler: @escaping () -> Void) {
+        self.handler = handler
+        super.init()
+    }
+    
+    override func main() {
+        print(#function)
+        syncAdd(handler: handler)
+    }
+}
+
+class BLESyncOperation: Operation {
+    public enum State: String {
+        case ready, executing, finished
+        
+        fileprivate var keyPath: String {
+            return "is" + rawValue.capitalized
+        }
+    }
+    
+    
+    public var state: State = .ready {
+        willSet {
+            willChangeValue(forKey: newValue.keyPath)
+            willChangeValue(forKey: state.keyPath)
+        }
+        didSet {
+            didChangeValue(forKey: oldValue.keyPath)
+            didChangeValue(forKey: state.keyPath)
+        }
+    }
     
     var writed: Bool = false
     
-    init(operationModel: OperationModel) {
-        super.init()
-        switch operationModel.type {
-        case .UI:
-            name = "UI"
-        case .preset:
-            name = "Preset"
-        }
-        self.completionBlock = operationModel.block
+    func syncAdd(handler: () -> Void) {
+        handler()
+        cancel()
+        //state = .finished
+        print(#function)
     }
+
 }
+
+extension BLESyncOperation {
+    override var isReady: Bool {
+        return super.isReady && state == .ready
+    }
+    
+    override var isExecuting: Bool {
+        return super.isExecuting && state == .executing
+    }
+    
+    override var isFinished: Bool {
+        return super.isFinished && state == .finished
+    }
+    
+    override var isAsynchronous: Bool {
+        return true
+    }
+    
+//    override func start() {
+//        print(#function)
+//        if isCancelled {
+//            state = .finished
+//            return
+//        }
+//        state = .ready
+//        main()
+//    }
+//    override func main() {
+//        print(#function)
+//        state = .ready
+//    }
+    
+    override func cancel() {
+        super.cancel()
+        state = .finished
+    }
+    
+}
+
+
 
 
 
