@@ -56,47 +56,65 @@ class BLEOper {
     // var operation: BLESyncOperation
     let serialQueue = DispatchQueue(label: "serialQueue")
     var item : DispatchWorkItem!
+    
     func load(queue: BLEQueue, operationModel: OperationModel) {
         self.queue = queue
         self.operationModel = operationModel
-        removeFinishedObject()
-        check()
     }
     
-    func start(operation: BLESyncOperation) {
+    func start() {
+        print(Thread.current)
+        let operation = BLESyncOperation(operationModel: self.operationModel)
         queue.addOperation(operation)
     }
     
-    func removeFinishedObject() {
-        for (index,value) in cancellableOperations.enumerated() {
-            if value.writed == true {
-                self.cancellableOperations.remove(at: index)
+    func removeOperations() {
+        guard let queue = self.queue else { return }
+        for index in 0..<queue.operations.count {
+            let value = queue.operations[index]
+            if value.name == "UI" {
+                print("cancel")
+                value.cancel()
             }
         }
-    }
-    
-    private func check() {
-        
-      //  self.item = DispatchWorkItem(block: {
-            
-            switch self.operationModel.type {
-            case .UI:
-                let operation = BLESyncOperation(operationModel: self.operationModel)
-                self.cancellableOperations.append(operation)
-            case .preset:
-                let operation = BLESyncOperation(operationModel: self.operationModel)
-                self.notCancellableOperations.append(operation)
-            }
-        
-            for (index,value) in self.cancellableOperations.enumerated() {
-                    self.start(operation: value)
-                    value.writed = true
-        }
-        
-        
-        print(cancellableOperations.count)
     }
 }
+
+class BLEQueue: OperationQueue {
+    
+    var workItem: DispatchWorkItem!
+    
+    var serialQueue = DispatchQueue(label: "serialQueue")
+    
+    var isBlock: Bool = false
+    
+    var bleOper = BLEOper()
+    
+    func start(block: @escaping ()->Void ) {
+        
+        
+        let model = OperationModel(type: .UI , block: block)
+        
+        bleOper.load(queue: self, operationModel: model)
+        
+        bleOper.start()
+        
+        isSuspended = true
+    }
+    
+    func resume() {
+        bleOper.removeOperations()
+        self.isSuspended = false
+    }
+    
+    
+    override init() {
+        super.init()
+        self.maxConcurrentOperationCount = 1
+    }
+}
+
+
 class BLESyncOperation: Operation {
     
     
@@ -124,45 +142,3 @@ enum OperationType {
     case UI
     case preset
 }
-
-
-
-class BLEQueue: OperationQueue {
-    
-    
-    
-    var workItem: DispatchWorkItem!
-    
-    var isBlock: Bool = false
-    
-    var bleOper = BLEOper()
-    
-    func start(block: @escaping ()->Void ) {
-        
-        let model = OperationModel(type: .UI , block: block)
-
-        if isSuspended == false {
-            bleOper.load(queue: self, operationModel: model)
-        }
-        
-
-        isSuspended = true
-    }
-    
-    
-    func addBLEOperation(operation: OperationModel) {
-        
-    }
-    
-    func resume() {
-        self.isSuspended = false
-    }
-    
-    
-    override init() {
-        super.init()
-        
-        self.maxConcurrentOperationCount = 1
-    }
-}
-
