@@ -47,9 +47,9 @@ class BleClientImpl: NSObject, BleClient {
     
     //MARK: Properties
     let centralManager: CBCentralManager
-    let queue = BLEQueue()
-    var operation: BLEOper!
     var findedPeripherals: [CBPeripheral] = []
+    var worker: BLEWorker!
+    let BLEQueue = BLEQueueImpl()
     
     private var txCharacteristic: CBCharacteristic!
     private var rxCharacteristic: CBCharacteristic!
@@ -60,18 +60,26 @@ class BleClientImpl: NSObject, BleClient {
         self.centralManager = centralManager
         super.init()
         centralManager.delegate = self
+        
+        worker = BLEWorker(outputQueue: BLEQueue)
+        //Запуск проверки на присутствие сообщений для отправки
+        worker.start()
     }
     
+    
+    //TODO: Перенести метод в BLEDevice
     func writeData(data: Int) {
-        
         var int = UInt8(data)
+        
+        
         let value = Data(bytes: &int, count: MemoryLayout.size(ofValue: int))
         guard let peripheral = connectedPeripheral, let characteristic = txCharacteristic else { return }
-        //print("Write data \(value)")
         
-        queue.start {
-            peripheral.writeValue(value, for: characteristic, type: .withResponse)
-        }
+        let message = AnalogWriteMessage(value: 245)
+        
+//        queue.start {
+//            peripheral.writeValue(value, for: characteristic, type: .withResponse)
+//        }
     }
     
     func getDevicesList(peripheral: CBPeripheral) {
@@ -135,7 +143,7 @@ extension BleClientImpl: CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
-        self.queue.resume()
+        //self.queue.resume()
         print("RESUME")
 //        
 //        guard characteristic == rxCharacteristic, let characteristicValue = characteristic.value, let ASCIIstring = NSString(data: characteristicValue, encoding: String.Encoding.utf8.rawValue) else { return }

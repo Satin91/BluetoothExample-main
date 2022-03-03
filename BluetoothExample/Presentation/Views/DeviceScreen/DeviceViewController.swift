@@ -80,8 +80,9 @@ class DeviceScreenView: UIView {
     let bulbOffImageView = UIImageView()
     let bulbOnImageView = UIImageView()
     
-    let turnOnDiodeButton = RectangleButton(isOn: .on)
-    let turnOffDiodeButton = RectangleButton(isOn: .off)
+    let turnOnDiodeButton  = RectangleButton(type: .on)
+    let turnOffDiodeButton = RectangleButton(type: .off)
+    let presetButton       = RectangleButton(type: .preset)
     let slider = UISlider()
     
     override init(frame: CGRect) {
@@ -101,6 +102,8 @@ class DeviceScreenView: UIView {
         self.addSubview(turnOffDiodeButton)
         self.turnOffDiodeButton.frame.origin.x = 240
         self.turnOffDiodeButton.frame.origin.y = 200
+        
+        
     }
         
     func setupSlider() {

@@ -21,6 +21,10 @@ class MainViewController: UIViewController {
         mainScreenView.setup()
         setupTableView()
         reload()
+        let message = AnalogWriteMessage(value: 5)
+        message.completion = { message in
+            print("kek")
+        }
     }
     
     func reload() {

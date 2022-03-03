@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		75011FDA27D09FDE00DA160B /* BLEWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75011FD927D09FDE00DA160B /* BLEWorker.swift */; };
+		75011FFD27D0D29000DA160B /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75011FFC27D0D29000DA160B /* Message.swift */; };
+		75011FFF27D0D2B200DA160B /* BLEQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75011FFE27D0D2B200DA160B /* BLEQueue.swift */; };
+		7501200127D0E1B500DA160B /* BLEDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7501200027D0E1B500DA160B /* BLEDevice.swift */; };
 		75118E2527C6595A0036FCD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75118E2427C6595A0036FCD8 /* AppDelegate.swift */; };
 		75118E2727C6595A0036FCD8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75118E2627C6595A0036FCD8 /* SceneDelegate.swift */; };
 		75118E2927C6595A0036FCD8 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75118E2827C6595A0036FCD8 /* MainViewController.swift */; };
@@ -34,6 +38,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		75011FD927D09FDE00DA160B /* BLEWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEWorker.swift; sourceTree = "<group>"; };
+		75011FFC27D0D29000DA160B /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		75011FFE27D0D2B200DA160B /* BLEQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEQueue.swift; sourceTree = "<group>"; };
+		7501200027D0E1B500DA160B /* BLEDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDevice.swift; sourceTree = "<group>"; };
 		75118E2127C6595A0036FCD8 /* BluetoothExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75118E2427C6595A0036FCD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75118E2627C6595A0036FCD8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -73,6 +81,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		75011FFB27D0D24300DA160B /* Deprecated */ = {
+			isa = PBXGroup;
+			children = (
+				7513FCFE27CDDD92008AA417 /* OperationQueue.swift */,
+			);
+			path = Deprecated;
+			sourceTree = "<group>";
+		};
 		75118E1827C659590036FCD8 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +118,7 @@
 				7597820827C902B1006CA4C1 /* Presentation */,
 				7597820D27C9166F006CA4C1 /* Infastructure */,
 				752323EB27CA2D24004B4FDD /* Resources */,
+				75011FFB27D0D24300DA160B /* Deprecated */,
 				75118E2D27C659600036FCD8 /* Assets.xcassets */,
 				75118E2F27C659600036FCD8 /* LaunchScreen.storyboard */,
 				75118E3227C659600036FCD8 /* Info.plist */,
@@ -210,7 +227,10 @@
 			isa = PBXGroup;
 			children = (
 				7597820B27C9165D006CA4C1 /* BleClient.swift */,
-				7513FCFE27CDDD92008AA417 /* OperationQueue.swift */,
+				75011FFE27D0D2B200DA160B /* BLEQueue.swift */,
+				75011FD927D09FDE00DA160B /* BLEWorker.swift */,
+				75011FFC27D0D29000DA160B /* Message.swift */,
+				7501200027D0E1B500DA160B /* BLEDevice.swift */,
 			);
 			path = Infastructure;
 			sourceTree = "<group>";
@@ -310,13 +330,17 @@
 				752323EA27CA27B2004B4FDD /* MainViewCoordinator.swift in Sources */,
 				752323E827CA26D6004B4FDD /* MainViewModel.swift in Sources */,
 				7597820527C901E5006CA4C1 /* DeviceViewController.swift in Sources */,
+				75011FFF27D0D2B200DA160B /* BLEQueue.swift in Sources */,
 				7597821227C92B5A006CA4C1 /* ArduinoSettings.swift in Sources */,
 				752323F327CA51FA004B4FDD /* MainScreenView.swift in Sources */,
 				752323FE27CAAFE8004B4FDD /* RectangleButton.swift in Sources */,
 				75E6F21427C7522E00D45739 /* ScanTableViewCell.swift in Sources */,
 				7597820727C90298006CA4C1 /* DeviceViewModel.swift in Sources */,
 				7597820127C900C5006CA4C1 /* Device.swift in Sources */,
+				75011FFD27D0D29000DA160B /* Message.swift in Sources */,
 				75118E2727C6595A0036FCD8 /* SceneDelegate.swift in Sources */,
+				75011FDA27D09FDE00DA160B /* BLEWorker.swift in Sources */,
+				7501200127D0E1B500DA160B /* BLEDevice.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

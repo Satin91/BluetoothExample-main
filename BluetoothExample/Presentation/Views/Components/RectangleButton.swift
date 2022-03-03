@@ -15,28 +15,31 @@ class RectangleButton: UIButton {
         super.init(frame: frame)
         
     }
-    enum isOn {
+    enum ButtonType {
         case on
         case off
+        case preset
     }
-    convenience init(isOn: isOn) {
+    convenience init(type: ButtonType) {
         self.init()
-        setup(isOn: isOn)
+        setup(type: type)
         
     }
     
-    func setup(isOn: isOn) {
+    func setup(type: ButtonType) {
         self.layer.cornerCurve  = .continuous
         self.layer.cornerRadius = 16
         self.clipsToBounds = true
-        switch isOn {
+        switch type {
         case .on:
             self.backgroundColor = .systemBlue
             self.setTitle("On", for: .normal)
         case .off:
             self.setTitle("Off", for: .normal)
             self.backgroundColor = .systemRed
-            
+        case .preset:
+            self.setTitle("Preset", for: .normal)
+            self.backgroundColor = .systemYellow
         }
     }
     
