@@ -20,8 +20,7 @@ class BLEWorker {
     private var outputQueue: BLEQueueOutput?
     
     //Внутренняя очередь для отправления сообщений
-    private var workerQueue = DispatchQueue(label: "worlerQueue")
-    
+    private var workerQueue: DispatchQueue = DispatchQueue(label: "workerQueue",attributes: .concurrent)
     //Работает ли проверка
     private var isWorkerRunning: Bool = true
     
@@ -36,45 +35,70 @@ class BLEWorker {
     
     //Подключает внешнюю очередь
     public func connect(queue: BLEQueueOutput) {
-        //set output queue
         self.outputQueue = queue
     }
     
-    //Отправляет данные на утройство
-    public func push(data: Data) {
-        
-    }
     
-    //var currentMessage: Message<NSObject>?
+    
+    var currentMessages: [Message<NSObject>]?
+    
+    var semaphore = DispatchSemaphore(value: 0)
     
     //Отключает внешнюю очередь
     public func disconnectQueue() {
         self.outputQueue = nil
     }
     
+    var workItem: DispatchWorkItem!
+    
     //Запускает цикл для проверки на присутствие сообщений
     public func start() {
+        
         workerQueue.async { [weak self] in
             guard let self = self else { return }
             
+           
             while self.isWorkerRunning {
-                if let message = self.outputQueue?.pull() {
-                    let data = message.getData()
-                    //send message
-                    //Остановка потока
-                    self.delegate.send(data: data)
-                    
-                    //Ждем когда придет сообщение
-                    let result = message.start()
-                    switch result {
-                    case .success(let message):
-                        print(message)
-                    case .failure(let error):
-                        print("Error 'Out of time' \(error)")
+                
+                guard let messages = self.outputQueue?.pull() else { continue }
+                
+                
+                if self.isExecuting == false {
+
+                        self.sendValue(messages: messages)
                     }
-                }
-                Thread.sleep(forTimeInterval: 0.04)
+              
+                
+                Thread.sleep(forTimeInterval: 0.01)
             }
+        }
+    }
+    
+    var isExecuting: Bool = false
+    
+    func sendValue(messages: [Message<NSObject>]) {
+        
+        AppDelegate.MessageQueue.async {
+        
+        self.isExecuting = true
+        for message in messages {
+            let data = message.getData()
+            self.delegate.send(data: data)
+            let result = message.start()
+            switch result {
+            case .success(let message):
+                let mes = message as! AnalogWriteMessage
+                print("Message received \(mes.analogValue)")
+            case .failure(let error):
+                print("Error 'Out of time' \(error)")
+            }
+        }
+       
+        self.isExecuting = false
+        print(self.isExecuting)
+        self.outputQueue?.clear()
+        
+        return
         }
     }
     
@@ -82,5 +106,10 @@ class BLEWorker {
     func stop() {
         isWorkerRunning = false
     }
+    func resume() {
+        isWorkerRunning = true
+        self.start()
+    }
+    
 }
 

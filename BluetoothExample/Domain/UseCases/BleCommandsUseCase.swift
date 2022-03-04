@@ -34,7 +34,7 @@ final class BleCommandsUseCase {
         bleCommands.disconnect()
     }
     
-    func sendCommand(data: Int) {
+    func sendCommand(data: UInt8) {
         self.bleCommands.sendCommand(data: data)
     }
     

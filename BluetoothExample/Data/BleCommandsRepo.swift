@@ -13,7 +13,7 @@ protocol BleCommandsImplDependencies {
 
 protocol BleCommandsRepo {
     func getDevicesList() -> [Device]
-    func sendCommand(data: Int)
+    func sendCommand(data: UInt8)
     func connectPeripheral()
     func disconnect()
     func startScan()
@@ -52,7 +52,7 @@ class BleCommandsRepoImpl: BleCommandsRepo {
         bleClient.disconnect()
     }
     
-    func sendCommand(data: Int) {
+    func sendCommand(data: UInt8) {
         bleClient.writeData(data: data)
     }
     

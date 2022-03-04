@@ -16,7 +16,7 @@ protocol DeviceViewModel: AnyObject {
     var device: Device { get set }
     
     func viewDidLoad()
-    func sendCommand(data: Int)
+    func sendCommand(data: UInt8)
     func disconnect()
 }
 
@@ -36,7 +36,7 @@ class DeviceViewModelImpl: DeviceViewModel {
         bleCommandsUseCase.connectPeripheral()
     }
     
-    func sendCommand(data: Int) {
+    func sendCommand(data: UInt8) {
         bleCommandsUseCase.sendCommand(data: data)
     }
     

@@ -36,7 +36,7 @@ class DeviceViewController: UIViewController {
     var tmp = 0
     @objc func moveSlider(_ sender: UISlider) {
        
-        let value = Int(sender.value * 255)
+        let value = UInt8(sender.value * 255)
         deviceScreenView.setImageAlpha(value: sender.value)
         deviceViewModel.sendCommand(data: value)
     }

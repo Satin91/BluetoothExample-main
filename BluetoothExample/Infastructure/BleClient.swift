@@ -25,13 +25,15 @@ protocol BleClient: AnyObject {
     var findedPeripherals: [CBPeripheral] { get set }
     func startScan()
     func stopScan()
-    func writeData(data: Int)
+    func writeData(data: UInt8)
     func connectPeripheral()
     func disconnect()
     func getDevicesList(peripheral: CBPeripheral)
 }
 
-class BleClientImpl: NSObject, BleClient {
+class BleClientImpl: NSObject, BleClient, BLEWorkerDelegate {
+    
+    
     
     func connectPeripheral() {
         self.connectedPeripheral = findedPeripherals.first
@@ -60,26 +62,24 @@ class BleClientImpl: NSObject, BleClient {
         self.centralManager = centralManager
         super.init()
         centralManager.delegate = self
-        
         worker = BLEWorker(outputQueue: BLEQueue)
+        worker.delegate = self
         //Запуск проверки на присутствие сообщений для отправки
-        worker.start()
+        
     }
     
-    
+    var message: AnalogWriteMessage = AnalogWriteMessage(value: 0)
     //TODO: Перенести метод в BLEDevice
-    func writeData(data: Int) {
-        var int = UInt8(data)
-        
-        
-        let value = Data(bytes: &int, count: MemoryLayout.size(ofValue: int))
+    func writeData(data: UInt8) {
+        AppDelegate.MessageQueue.sync {
+            message.analogValue = data
+            self.BLEQueue.add(message: self.message)
+        }
+    }
+    
+    func send(data: Data) {
         guard let peripheral = connectedPeripheral, let characteristic = txCharacteristic else { return }
-        
-        let message = AnalogWriteMessage(value: 245)
-        
-//        queue.start {
-//            peripheral.writeValue(value, for: characteristic, type: .withResponse)
-//        }
+        peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
     
     func getDevicesList(peripheral: CBPeripheral) {
@@ -126,6 +126,7 @@ extension BleClientImpl: CBCentralManagerDelegate {
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         peripheral.discoverServices(nil)
+        worker.start()
     }
     
     
@@ -144,11 +145,14 @@ extension BleClientImpl: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
         //self.queue.resume()
-        print("RESUME")
-//        
-//        guard characteristic == rxCharacteristic, let characteristicValue = characteristic.value, let ASCIIstring = NSString(data: characteristicValue, encoding: String.Encoding.utf8.rawValue) else { return }
-//        let characteristicASCIIValue = ASCIIstring
-//
+        guard let data = characteristic.value else { return }
+        AppDelegate.MessageQueue.sync {
+            self.message.finish(with: data)
+        }
+        //
+        //        guard characteristic == rxCharacteristic, let characteristicValue = characteristic.value, let ASCIIstring = NSString(data: characteristicValue, encoding: String.Encoding.utf8.rawValue) else { return }
+        //        let characteristicASCIIValue = ASCIIstring
+        //
         //  print("Value Recieved: \((characteristicASCIIValue as String))")
     }
     
