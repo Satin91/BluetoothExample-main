@@ -23,7 +23,7 @@ protocol TransportObject {
 class Message<T: NSObject>: TransportObject {
     
     
-    private var semaphore = DispatchSemaphore(value: 1)
+    private var semaphore = DispatchSemaphore(value: 0)
     
     enum LoadError: Error {
         case outOfTime
@@ -33,7 +33,7 @@ class Message<T: NSObject>: TransportObject {
    
     //В этом метаде идет отправка результата передачи сигнала, если сработал finish - сигнал передан
     func start() -> Result<Message,Error> {
-        let state = semaphore.wait(timeout: .now() + 1 )
+        let state = semaphore.wait(timeout: .now() + 2 )
         switch state {
         case .success:
             return .success(self)

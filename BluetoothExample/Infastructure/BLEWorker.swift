@@ -42,7 +42,7 @@ class BLEWorker {
     
     var currentMessages: [Message<NSObject>]?
     
-    var semaphore = DispatchSemaphore(value: 0)
+   // var semaphore = DispatchSemaphore(value: 1)
     
     //Отключает внешнюю очередь
     public func disconnectQueue() {
@@ -62,13 +62,9 @@ class BLEWorker {
                 
                 guard let messages = self.outputQueue?.pull() else { continue }
                 
-                
-                if self.isExecuting == false {
-
-                        self.sendValue(messages: messages)
-                    }
-              
-                
+                AppDelegate.MessageQueue.sync {
+                    self.sendValue(messages: messages)
+                }
                 Thread.sleep(forTimeInterval: 0.01)
             }
         }
@@ -78,9 +74,6 @@ class BLEWorker {
     
     func sendValue(messages: [Message<NSObject>]) {
         
-        AppDelegate.MessageQueue.async {
-        
-        self.isExecuting = true
         for message in messages {
             let data = message.getData()
             self.delegate.send(data: data)
@@ -94,12 +87,9 @@ class BLEWorker {
             }
         }
        
-        self.isExecuting = false
-        print(self.isExecuting)
-        self.outputQueue?.clear()
+         self.outputQueue?.clear()
         
         return
-        }
     }
     
     //Останавливает поиск сообщений

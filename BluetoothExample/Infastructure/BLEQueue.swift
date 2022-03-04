@@ -34,7 +34,6 @@ class BLEQueueImpl: BLEQueue {
     //сделать массивом сообщений
     private var message: [Message<NSObject>]?
     
-    
     func add(message: Message<NSObject>) {
         self.message = [message]
     }

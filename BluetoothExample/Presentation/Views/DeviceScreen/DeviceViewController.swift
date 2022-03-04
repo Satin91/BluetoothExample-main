@@ -31,12 +31,13 @@ class DeviceViewController: UIViewController {
     }
     
     func setupSlider() {
-        deviceScreenView.slider.addTarget(self, action: #selector(moveSlider(_:)), for: .valueChanged)
+        deviceScreenView.slider.addTarget(self, action: #selector(sliderDidChangeValue(_:)), for: .valueChanged)
     }
     var tmp = 0
-    @objc func moveSlider(_ sender: UISlider) {
-       
+    @objc func sliderDidChangeValue(_ sender: UISlider) {
+        
         let value = UInt8(sender.value * 255)
+        deviceScreenView.setSliderValueLabelText(value: value)
         deviceScreenView.setImageAlpha(value: sender.value)
         deviceViewModel.sendCommand(data: value)
     }
@@ -47,14 +48,16 @@ class DeviceViewController: UIViewController {
     }
     
     @objc func onButtonTapped(_ sender: UIButton) {
-        self.deviceScreenView.slider.setValue(1, animated: true)
+        self.deviceScreenView.slider.setValue(1, animated: false)
         deviceScreenView.setImageAlpha(value: 1)
+        deviceScreenView.setSliderValueLabelText(value: 255)
         deviceViewModel.sendCommand(data: 255)
     }
     
     @objc func offButtonTapped(_ sender: UIButton) {
-        self.deviceScreenView.slider.setValue(0, animated: true)
+        self.deviceScreenView.slider.setValue(0, animated: false)
         deviceScreenView.setImageAlpha(value: 0)
+        deviceScreenView.setSliderValueLabelText(value: 0)
         deviceViewModel.sendCommand(data: 0)
     }
     
@@ -71,8 +74,17 @@ class DeviceScreenView: UIView {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .black.withAlphaComponent(0.7)
         label.font = .systemFont(ofSize: 26, weight: .black)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    let sliderValueLabel: UILabel = {
+        let label = UILabel()
+        label.text = "0"
+        label.textColor = .black.withAlphaComponent(0.7)
+        label.font = .systemFont(ofSize: 28, weight: .regular)
         label.textAlignment = .center
         return label
     }()
@@ -84,6 +96,7 @@ class DeviceScreenView: UIView {
     let turnOffDiodeButton = RectangleButton(type: .off)
     let presetButton       = RectangleButton(type: .preset)
     let slider = UISlider()
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -105,22 +118,26 @@ class DeviceScreenView: UIView {
         
         
     }
-        
+    
     func setupSlider() {
         addSubview(slider)
         slider.frame = CGRect(x: 130, y: 450, width: 280 , height: 40)
         slider.transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi / 2))
     }
- 
+    
     func setupImageViews() {
         self.addSubview(bulbOffImageView)
         bulbOffImageView.image = UIImage(named: "bulbOff")
-        bulbOffImageView.frame = CGRect(x: 20, y: 300, width: 120, height: 174)
+        bulbOffImageView.frame = CGRect(x: 20, y: 300, width: 80, height: 116)
         
         bulbOffImageView.addSubview(self.bulbOnImageView)
         bulbOnImageView.image = UIImage(named: "bulbOn")
         bulbOnImageView.alpha = 0.0
-       
+        
+    }
+    
+    func setSliderValueLabelText(value: UInt8) {
+        self.sliderValueLabel.text = String(value)
     }
     
     func setImageAlpha(value: Float) {
@@ -129,7 +146,7 @@ class DeviceScreenView: UIView {
     
     func setupLabels() {
         self.addSubview(nameLabel)
-        nameLabel.alpha = 0.7
+        self.addSubview(sliderValueLabel)
     }
     
     required init?(coder: NSCoder) {
@@ -139,12 +156,17 @@ class DeviceScreenView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        self.nameLabel.frame = CGRect(x: 0, y: 60, width: self.bounds.width, height: 120)
-        
+        //imageViews
         bulbOffImageView.center.x = self.center.x
         bulbOffImageView.center.y = self.center.y + 120
         bulbOnImageView.frame     = bulbOffImageView.bounds
+        
+        //labels
+        nameLabel.frame        = CGRect(x: 0, y: 60, width: self.bounds.width, height: 120)
+        sliderValueLabel.frame = CGRect(x: 0, y: 200 + 60, width: self.bounds.width, height: 120)
+        
+        
     }
-  
+    
     
 }

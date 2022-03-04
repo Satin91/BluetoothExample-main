@@ -51,7 +51,7 @@ class BleClientImpl: NSObject, BleClient, BLEWorkerDelegate {
     let centralManager: CBCentralManager
     var findedPeripherals: [CBPeripheral] = []
     var worker: BLEWorker!
-    let BLEQueue = BLEQueueImpl()
+    var BLEQueue = BLEQueueImpl()
     
     private var txCharacteristic: CBCharacteristic!
     private var rxCharacteristic: CBCharacteristic!
@@ -79,14 +79,12 @@ class BleClientImpl: NSObject, BleClient, BLEWorkerDelegate {
     
     func send(data: Data) {
         guard let peripheral = connectedPeripheral, let characteristic = txCharacteristic else { return }
-        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+        peripheral.writeValue(data, for: characteristic, type: .withoutResponse)
     }
     
     func getDevicesList(peripheral: CBPeripheral) {
         self.findedPeripherals = [peripheral]
     }
-    
-    
     
     func startScan() {
         centralManager.scanForPeripherals(withServices: [CBUUIDs.BLEService_UUID] , options: nil)
