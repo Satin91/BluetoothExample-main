@@ -33,7 +33,7 @@ class DeviceViewController: UIViewController {
     func setupSlider() {
         deviceScreenView.slider.addTarget(self, action: #selector(sliderDidChangeValue(_:)), for: .valueChanged)
     }
-    var tmp = 0
+    
     @objc func sliderDidChangeValue(_ sender: UISlider) {
         
         let value = UInt8(sender.value * 255)
