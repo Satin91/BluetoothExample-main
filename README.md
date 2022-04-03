@@ -1,2 +1,2 @@
 # BluetoothExample-main
-Фреймворк для работы с Bluetooth low energy для команды @ Black brikcs
+Фреймворк для работы с Bluetooth low energy для команды @ Black bricks
